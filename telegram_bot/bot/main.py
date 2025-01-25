@@ -6,7 +6,6 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler, Cont
 from handlers.cart_handler import add_to_cart, view_cart, handle_cart_callback
 from handlers.catalog_handler import start_catalog, handle_callback
 from handlers.faq_handler import inline_faq
-from handlers.order_handler import place_order
 from handlers.start_handler import handle_start_callback
 from handlers.mailing_handler import manual_mailing, send_mailing
 from utils.logger import logger
@@ -74,7 +73,6 @@ def main():
     application.add_handler(CommandHandler("catalog", start_catalog))
     application.add_handler(CommandHandler("cart", view_cart))
     application.add_handler(CommandHandler("faq", inline_faq))
-    application.add_handler(CommandHandler("order", place_order))
     application.add_handler(CommandHandler("send_mailing", manual_mailing))
 
     application.add_handler(InlineQueryHandler(inline_faq))

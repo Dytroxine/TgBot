@@ -1,3 +1,14 @@
+-- Настройка доступа для всех хостов
+ALTER SYSTEM SET listen_addresses = '*';
+SELECT pg_reload_conf();
+
+
+-- Таблица пользователей Telegram
+CREATE TABLE IF NOT EXISTS telegram_users (
+    id BIGINT PRIMARY KEY
+);
+
+-- Таблица обязательных подписок
 CREATE TABLE IF NOT EXISTS required_subscriptions (
     id SERIAL PRIMARY KEY,
     channel_id VARCHAR(255) NOT NULL,
@@ -28,27 +39,24 @@ CREATE TABLE IF NOT EXISTS products (
     subcategory_id INTEGER REFERENCES subcategories(id) ON DELETE CASCADE
 );
 
+-- Таблица корзины
 CREATE TABLE IF NOT EXISTS cart (
     id SERIAL PRIMARY KEY,
     user_id BIGINT REFERENCES telegram_users(id) ON DELETE CASCADE,
-    product_id INT NOT NULL,
-    quantity INT DEFAULT 1,
+    product_id INTEGER NOT NULL,
+    quantity INTEGER DEFAULT 1,
     updated_at TIMESTAMP DEFAULT NOW(),
     UNIQUE (user_id, product_id)
 );
 
-
-CREATE TABLE telegram_users (
-    id BIGINT PRIMARY KEY
-);
-
+-- Таблица рассылок
 CREATE TABLE IF NOT EXISTS mailings (
-    id SERIAL PRIMARY KEY,                      -- Уникальный идентификатор рассылки
-    title VARCHAR(255) NOT NULL,                -- Название рассылки
-    message TEXT NOT NULL,                      -- Текст сообщения рассылки
-    created_at TIMESTAMP DEFAULT NOW(),         -- Время создания рассылки
-    scheduled_at TIMESTAMP,                     -- Время запланированной рассылки
-    is_sent BOOLEAN DEFAULT FALSE,               -- JSON-список пользователей для рассылки
-    image VARCHAR(255),                  -- JSON-список URL изображений
-    last_sent_at TIMESTAMP                      -- Время последней отправки рассылки
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    scheduled_at TIMESTAMP,
+    is_sent BOOLEAN DEFAULT FALSE,
+    image VARCHAR(255),
+    last_sent_at TIMESTAMP
 );
