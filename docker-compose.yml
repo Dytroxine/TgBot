@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:15
+    container_name: tg_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql # Автоматическое выполнение init.sql
+
+  web:
+    build:
+      context: ./admin_panel
+      dockerfile: Dockerfile
+    container_name: tg_admin_panel
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py start"
+    volumes:
+      - ./admin_panel:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=db
+    depends_on:
+      - db
+
+  bot:
+    build:
+      context: ./telegram_bot
+      dockerfile: Dockerfile
+    container_name: tg_bot
+    command: >
+      python bot/main.py
+    volumes:
+      - ./telegram_bot:/app
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=db
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
