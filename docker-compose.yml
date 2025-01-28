@@ -26,6 +26,7 @@ services:
     container_name: tg_web
     command: >
       sh -c "python admin_panel/manage.py migrate &&
+             echo \"from django.contrib.auth.models import User; User.objects.create_superuser(username='${DJANGO_SUPERUSER_USERNAME}', email='${DJANGO_SUPERUSER_EMAIL}', password='${DJANGO_SUPERUSER_PASSWORD}') if not User.objects.filter(username='${DJANGO_SUPERUSER_USERNAME}').exists() else print('Superuser exists.')\" | python admin_panel/manage.py shell &&
              python admin_panel/manage.py start"
     volumes:
       - .:/app

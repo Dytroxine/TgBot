@@ -23,6 +23,29 @@ dp = Dispatcher()
 @require_subscription
 async def start_command(message: Message):
     """Обработчик команды /start."""
+    user_id = message.from_user.id
+
+    # Подключаемся к базе данных
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    try:
+        # Проверяем, существует ли пользователь в таблице
+        cursor.execute("SELECT id FROM telegram_users WHERE id = %s", (user_id,))
+        user_exists = cursor.fetchone()
+
+        # Если пользователя нет, добавляем его
+        if not user_exists:
+            cursor.execute("INSERT INTO telegram_users (id) VALUES (%s)", (user_id,))
+            connection.commit()  # Фиксируем изменения в базе
+
+    except Exception as e:
+        print(f"Ошибка при работе с базой данных: {e}")
+
+    finally:
+        # Закрываем соединение
+        cursor.close()
+        connection.close()
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
             InlineKeyboardButton(text="Перейти в каталог 🛒", callback_data="open_catalog"),
