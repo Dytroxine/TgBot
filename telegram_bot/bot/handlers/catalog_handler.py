@@ -19,7 +19,7 @@ async def start_catalog(callback_query: CallbackQuery):
     connection.close()
 
     if not categories:
-        await callback_query.message.answer("Каталог пуст. Пожалуйста, зайдите позже.")
+        await callback_query.answer("Каталог пуст. Пожалуйста, зайдите позже.")
         return
 
     # Формируем клавиатуру с кнопками категорий
